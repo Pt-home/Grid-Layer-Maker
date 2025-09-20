@@ -1,6 +1,8 @@
+/* Grid Layer Maker — Live Messaging v2 (robust) */
 const qs = (id) => document.getElementById(id);
 const targetEl = qs("target");
 const nameEl   = qs("docName");
+const modeEl   = qs("insertMode");
 const wEl      = qs("w");
 const hEl      = qs("h");
 const stepXEl  = qs("stepX");
@@ -54,8 +56,21 @@ qs("make").addEventListener("click", async () => {
   const png = renderGridPNG(W,H,readGridParams());
   console.log("[GridMaker] Rendered PNG", W, H, png.length, "bytes");
 
-  const safe = png.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+  const safe = png.replace(/\/g, "\\").replace(/"/g, '\"');
   await ensurePP().catch(()=>{});
+
+  if (intoCurrent) {
+    const raster = modeEl.value === "raster";
+    const sc = raster
+      ? `try{ app.open("${safe}", null, true); if(app.activeLayer && app.activeLayer.rasterize) app.activeLayer.rasterize(); app.echoToOE("placed-raster"); }catch(e){ app.echoToOE("ERR:"+e); }`
+      : `try{ app.open("${safe}", null, true); app.echoToOE("placed-smart"); }catch(e){ app.echoToOE("ERR:"+e); }`;
+    const res = await runScript(sc);
+    console.log("[GridMaker] place result:", res);
+  } else {
+    const sc = `try{ app.open("${safe}"); app.echoToOE("opened"); }catch(e){ app.echoToOE("ERR:"+e); }`;
+    const res = await runScript(sc);
+    console.log("[GridMaker] open result:", res);
+  }
 
   if (intoCurrent) {
     // Place as new layer
