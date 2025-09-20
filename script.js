@@ -1,4 +1,6 @@
 const qs = (id) => document.getElementById(id);
+
+// UI
 const targetEl = qs("target");
 const nameEl   = qs("docName");
 const wEl      = qs("w");
@@ -14,16 +16,15 @@ const marginEl = qs("margin");
 
 let PP_READY = false;
 window.addEventListener("message", (e) => {
-  if (e.data === "done") { PP_READY = true; }
+  if (e.data === "done") PP_READY = true;
 });
 
-async function ensurePP(timeout=8000){
-  if (PP_READY) return;
-  await new Promise((resolve, reject) => {
+function ensurePP(timeout=8000){
+  return new Promise((resolve, reject)=>{
+    if (PP_READY) return resolve();
     const t = setTimeout(()=>reject(new Error("PP not ready")), timeout);
-    const onMsg = (e)=>{ if(e.data==="done"){ clearTimeout(t); window.removeEventListener("message", onMsg); PP_READY=true; resolve(); } };
+    function onMsg(e){ if(e.data==="done"){ clearTimeout(t); window.removeEventListener("message", onMsg); PP_READY=true; resolve(); } }
     window.addEventListener("message", onMsg);
-    // poke PP
     window.parent.postMessage("/* ping */", "*");
   });
 }
@@ -31,11 +32,11 @@ async function ensurePP(timeout=8000){
 function runScript(script){
   return new Promise((resolve)=>{
     const out=[];
-    const handler = (e)=>{
-      if(e.data==="done"){ window.removeEventListener("message", handler); resolve(out); }
+    function onMsg(e){
+      if(e.data==="done"){ window.removeEventListener("message", onMsg); resolve(out); }
       else out.push(e.data);
-    };
-    window.addEventListener("message", handler);
+    }
+    window.addEventListener("message", onMsg);
     window.parent.postMessage(script, "*");
   });
 }
@@ -44,7 +45,7 @@ qs("preview").addEventListener("click", async () => {
   const {W,H} = await decideSize(false);
   const png = renderGridPNG(W,H,readGridParams());
   const win = window.open();
-  win.document.write(`<img src="${png}" style="max-width:100%;height:auto;image-rendering:pixelated" />`);
+  win.document.write('<img src="'+png+'" style="max-width:100%;height:auto;image-rendering:pixelated" />');
   win.document.title = "Grid Preview";
 });
 
@@ -52,21 +53,21 @@ qs("make").addEventListener("click", async () => {
   const intoCurrent = targetEl.value === "current";
   const {W,H} = await decideSize(intoCurrent);
   const png = renderGridPNG(W,H,readGridParams());
-  console.log("[GridMaker] Rendered PNG", W, H, png.length, "bytes");
-
-  const safe = png.replace(/\/g, "\\").replace(/"/g, '\"');
   await ensurePP().catch(()=>{});
 
+  // Escape for JS string (double quotes + backslashes)
+  const safe = png.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+
   if (intoCurrent) {
-    const sc = `try{ app.open("${safe}", null, true); app.echoToOE("placed-smart"); }catch(e){ app.echoToOE("ERR:"+e); }`;
+    const sc = 'try{ app.open("' + safe + '", null, true); app.echoToOE("placed-smart"); }catch(e){ app.echoToOE("ERR:"+e); }';
     const res = await runScript(sc);
-    console.log("[GridMaker] place result:", res);
+    console.log("[GridMaker] place:", res);
   } else {
-    const sc = `try{ app.open("${safe}"); app.echoToOE("opened"); }catch(e){ app.echoToOE("ERR:"+e); }`;
+    const sc = 'try{ app.open("' + safe + '"); app.echoToOE("opened"); }catch(e){ app.echoToOE("ERR:"+e); }';
     const res = await runScript(sc);
-    console.log("[GridMaker] open result:", res);
+    console.log("[GridMaker] open:", res);
   }
-}
+});
 
 function readGridParams(){
   return {
@@ -116,20 +117,12 @@ async function decideSize(intoCurrent){
   if(!intoCurrent) return {W:clampInt(wEl.value,1,30000), H:clampInt(hEl.value,1,30000)};
   try{
     await ensurePP();
-    const res = await runScript(`
-      try{
-        var d = app.activeDocument;
-        if(!d){ app.echoToOE("{\\"w\\":0,\\"h\\":0}"); }
-        else { app.echoToOE(JSON.stringify({w:d.width, h:d.height})); }
-      }catch(e){ app.echoToOE("{\\"w\\":0,\\"h\\":0}"); }
-    `);
+    const res = await runScript(
+      'var d=app.activeDocument; if(!d){ app.echoToOE("{\\"w\\":0,\\"h\\":0}"); } else { app.echoToOE(JSON.stringify({w:d.width,h:d.height})); }'
+    );
     const obj = JSON.parse(res[0]||'{"w":0,"h":0}');
-    const W = clampInt(obj.w||wEl.value,1,30000);
-    const H = clampInt(obj.h||hEl.value,1,30000);
-    console.log("[GridMaker] size", W, H, res);
-    return {W,H};
+    return { W: clampInt(obj.w||wEl.value,1,30000), H: clampInt(obj.h||hEl.value,1,30000) };
   }catch(e){
-    console.warn("Size fetch failed, fallback to inputs.", e);
-    return {W:clampInt(wEl.value,1,30000), H:clampInt(hEl.value,1,30000)};
+    return { W: clampInt(wEl.value,1,30000), H: clampInt(hEl.value,1,30000) };
   }
 }
