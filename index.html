@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Grid Layer Maker</title>
+<style>
+  :root { font-family: system-ui, Arial, sans-serif; }
+  body { margin: 0; padding: 16px; }
+  h1 { font-size: 1.1rem; margin: 0 0 12px; }
+  fieldset { border: 1px solid #ddd; padding: 12px; margin: 0 0 12px; border-radius: 8px; }
+  legend { padding: 0 6px; color: #444; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 12px; margin-bottom: 8px; align-items: center; }
+  label { color: #333; font-size: 0.9rem; }
+  input[type="number"], input[type="text"], select { width: 100%; padding: 6px 8px; border: 1px solid #ccc; border-radius: 6px; }
+  input[type="color"] { width: 100%; height: 32px; padding: 0; border: 1px solid #ccc; border-radius: 6px; }
+  .btns { display: flex; gap: 8px; }
+  button { padding: 10px 14px; border: 0; background: #0a84ff; color: #fff; border-radius: 8px; cursor: pointer; }
+  button.secondary { background: #666; }
+  .hint { font-size: 0.85rem; color: #666; margin-top: 4px; }
+</style>
+</head>
+<body>
+  <h1>Grid Layer Maker</h1>
+
+  <fieldset>
+    <legend>Target</legend>
+    <div class="row">
+      <label for="target">Insert into</label>
+      <select id="target">
+        <option value="current">Current document (auto size)</option>
+        <option value="new">New document (specify size)</option>
+      </select>
+
+      <label for="docName">New document name</label>
+      <input id="docName" type="text" value="Grid" />
+
+      <label for="w">Width (px)</label>
+      <input id="w" type="number" min="1" step="1" value="2048" />
+
+      <label for="h">Height (px)</label>
+      <input id="h" type="number" min="1" step="1" value="2048" />
+    </div>
+    <div class="hint">For "Current document" the size will be fetched from Photopea automatically.</div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Grid</legend>
+    <div class="row">
+      <label for="stepX">Horizontal step (px)</label>
+      <input id="stepX" type="number" min="1" step="1" value="64" />
+
+      <label for="stepY">Vertical step (px)</label>
+      <input id="stepY" type="number" min="1" step="1" value="64" />
+
+      <label for="angX">Horizontal lines angle (°)</label>
+      <input id="angX" type="number" step="0.1" value="0" />
+
+      <label for="angY">Vertical lines angle (°)</label>
+      <input id="angY" type="number" step="0.1" value="0" />
+
+      <label for="thick">Line thickness (px)</label>
+      <input id="thick" type="number" min="1" step="1" value="1" />
+
+      <label for="color">Line color</label>
+      <input id="color" type="color" value="#000000" />
+
+      <label for="crisp">Crisp 1px alignment</label>
+      <select id="crisp">
+        <option value="on" selected>On (0.5px alignment)</option>
+        <option value="off">Off</option>
+      </select>
+
+      <label for="margin">Skip border (px)</label>
+      <input id="margin" type="number" min="0" step="1" value="0" />
+    </div>
+  </fieldset>
+
+  <div class="btns">
+    <button id="make">Insert Grid</button>
+    <button class="secondary" id="preview">Preview PNG</button>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

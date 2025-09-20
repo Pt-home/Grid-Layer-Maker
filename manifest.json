@@ -1,0 +1,10 @@
+{
+  "name": "Grid Layer Maker",
+  "version": "1.0.0",
+  "description": "Insert a transparent grid layer with custom steps, angles, thickness, and color.",
+  "main": "index.html",
+  "icons": [],
+  "author": "Your Name",
+  "homepage": "https://yourusername.github.io/grid-layer-maker/",
+  "id": "grid-layer-maker"
+}
