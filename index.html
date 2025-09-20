@@ -49,17 +49,17 @@ body { background: transparent; color: inherit; }
   <fieldset>
     <legend>Target</legend>
     <div class="row">
-      
-      <label for="insertMode">Insert mode</label>
-      <select id="insertMode">
-        <option value="raster" selected>Raster layer (default)</option>
-        <option value="smart">Smart Object</option>
-      </select>
-
+      <label for="target">Insert into</label>
       <select id="target">
         <option value="current">Current document (auto size)</option>
         <option value="new">New document (specify size)</option>
       </select>
+
+      <label for="insertMode">Insert mode</label>
+      <select id="insertMode">
+        <option value="raster" selected>Raster layer (default)</option>
+        <option value="smart">Smart Object</option>
+      </select>    
 
       <label for="docName">New document name</label>
       <input id="docName" type="text" value="Grid" />
