@@ -55,15 +55,14 @@ qs("make").addEventListener("click", async () => {
   const png = renderGridPNG(W,H,readGridParams());
   await ensurePP().catch(()=>{});
 
-  // Escape for JS string (double quotes + backslashes)
-  const safe = png.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-
+  // Build the script safely (escape via JSON.stringify)
+  const s = JSON.stringify(png); // -> "data:image/png;base64,AAA..."
   if (intoCurrent) {
-    const sc = 'try{ app.open("' + safe + '", null, true); app.echoToOE("placed-smart"); }catch(e){ app.echoToOE("ERR:"+e); }';
+    const sc = `try{ app.open(${s}, null, true); app.echoToOE("placed-smart"); }catch(e){ app.echoToOE("ERR:"+e); }`;
     const res = await runScript(sc);
     console.log("[GridMaker] place:", res);
   } else {
-    const sc = 'try{ app.open("' + safe + '"); app.echoToOE("opened"); }catch(e){ app.echoToOE("ERR:"+e); }';
+    const sc = `try{ app.open(${s}); app.echoToOE("opened"); }catch(e){ app.echoToOE("ERR:"+e); }`;
     const res = await runScript(sc);
     console.log("[GridMaker] open:", res);
   }
