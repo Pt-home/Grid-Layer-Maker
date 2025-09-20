@@ -29,6 +29,18 @@ body { background: transparent; color: inherit; }
   .row > * { min-width: 0; }
   input, select, button { width: 100%; max-width: 100%; min-width: 0; }
   input[disabled], select[disabled] { opacity: 0.6; }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { background: transparent; color: inherit; }
+  fieldset { width: 100%; }
+  .row { grid-template-columns: 1fr 1fr; }
+  .row > * { min-width: 0; }
+  input, select, button { width: 100%; max-width: 100%; min-width: 0; }
+  /* Dark theme friendly */
+  input, select, button { background: rgba(255,255,255,0.06); color: #e9eef5; border: 1px solid rgba(255,255,255,0.18); }
+  label { color: #cfd6df; }
+  fieldset { border-color: rgba(255,255,255,0.2); }
 </style>
 </head>
 <body>
@@ -39,6 +51,15 @@ body { background: transparent; color: inherit; }
     <div class="row">
       <label for="target">Insert into</label>
       <select id="target">
+        </select>
+
+      <label for="insertMode">Insert mode</label>
+      <select id="insertMode">
+        <option value="raster" selected>Raster layer (default)</option>
+        <option value="smart">Smart Object</option>
+      </select>
+
+      <select id="target" style="display:none">
         <option value="current">Current document (auto size)</option>
         <option value="new">New document (specify size)</option>
       </select>
