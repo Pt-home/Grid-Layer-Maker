@@ -165,4 +165,5 @@ async function decideSize(intoCurrent) {
   }
 }
 
-
+// ---- helper to post raw script ----
+// (we already use window.parent.postMessage in runScript)
