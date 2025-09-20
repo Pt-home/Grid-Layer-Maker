@@ -164,6 +164,3 @@ async function decideSize(intoCurrent) {
     return { W: clampInt(wEl.value, 1, 30000), H: clampInt(hEl.value, 1, 30000) };
   }
 }
-
-// ---- helper to post raw script ----
-// (we already use window.parent.postMessage in runScript)
